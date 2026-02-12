@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { Navigation } from '../components/Navigation';
@@ -31,25 +31,7 @@ export default function Communities() {
     }
   }, []);
 
-  useEffect(() => {
-    checkBackendStatus();
-  }, []);
-
-  useEffect(() => {
-    if (searchQuery && communities.length > 0) {
-      const filtered = communities.filter(
-        (community) =>
-          community.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          community.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          community.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredCommunities(filtered);
-    } else {
-      setFilteredCommunities(communities);
-    }
-  }, [searchQuery, communities]);
-
-  const checkBackendStatus = async () => {
+  const checkBackendStatus = useCallback(async () => {
     try {
       setAgentState('checking');
       setLoading(true);
@@ -71,9 +53,9 @@ export default function Communities() {
       setLoading(false);
       setError(null);
     }
-  };
+  }, []);
 
-  const wakeBackend = async () => {
+  const wakeBackend = useCallback(async () => {
     try {
       setAgentState('waking');
       setLoading(true);
@@ -93,9 +75,9 @@ export default function Communities() {
       setAgentState('sleeping');
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchCommunities = async () => {
+  const fetchCommunities = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -127,7 +109,25 @@ export default function Communities() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkBackendStatus();
+  }, [checkBackendStatus]);
+
+  useEffect(() => {
+    if (searchQuery && communities.length > 0) {
+      const filtered = communities.filter(
+        (community) =>
+          community.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          community.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          community.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredCommunities(filtered);
+    } else {
+      setFilteredCommunities(communities);
+    }
+  }, [searchQuery, communities]);
 
   const renderContent = () => {
     if (loading && agentState !== 'sleeping') {
