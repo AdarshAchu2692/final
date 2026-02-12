@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Navigation } from '../components/Navigation';
 import { CommunityCard } from '../components/CommunityCard';
 import { Button } from '../components/ui/button';
-import { ArrowRight, Sparkles, PlusCircle, Smartphone } from 'lucide-react';
+import { ArrowRight, Sparkles, PlusCircle } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 const API = BACKEND_URL;
@@ -16,11 +16,6 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
 
-  // App store links - UPDATE THESE WITH YOUR ACTUAL LINKS
-  const APP_STORE_LINK = "https://apps.apple.com/your-app-id";
-  const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=your.app.id";
-
-  // Check if user is logged in
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -53,7 +48,6 @@ export default function Home() {
       console.error('❌ Error fetching featured communities:', error);
       setError('Failed to load communities');
       
-      // Fallback to regular communities if featured endpoint fails
       try {
         console.log('⚠️ Falling back to regular communities');
         const fallbackResponse = await axios.get(`${API}/communities`, {
@@ -72,7 +66,6 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0a0a]">
       <Navigation />
       
-      {/* Hero Section */}
       <section className="relative pt-32 pb-24 md:pt-48 md:pb-32 px-6 md:px-12 lg:px-24 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.15)_0%,_rgba(10,10,10,0)_70%)]" />
         
@@ -122,7 +115,6 @@ export default function Home() {
                 </Button>
               </Link>
               
-              {/* Create Community Button - Shows differently based on auth status */}
               {user?.is_creator ? (
                 <Link to="/create-community">
                   <Button
@@ -151,7 +143,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Communities Section */}
       <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-transparent to-zinc-950/30">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -181,9 +172,9 @@ export default function Home() {
           </motion.div>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-64 bg-zinc-900/50 rounded-3xl animate-pulse" />
+                <div key={i} className="h-48 sm:h-64 bg-zinc-900/50 rounded-2xl sm:rounded-3xl animate-pulse" />
               ))}
             </div>
           ) : error ? (
@@ -201,7 +192,7 @@ export default function Home() {
               <p className="text-zinc-400">No communities found</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="communities-grid">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" data-testid="communities-grid">
               {featuredCommunities.map((community, index) => (
                 <CommunityCard 
                   key={community.id || community._id || `featured-${index}`} 
@@ -214,76 +205,74 @@ export default function Home() {
         </div>
       </section>
 
-     {/* Creator Call-to-Action Section - REDUCED SIZE */}
-<section className="py-16 md:py-20 px-6 md:px-12 lg:px-24">
-  <div className="max-w-4xl mx-auto">
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="bg-gradient-to-r from-primary/20 via-purple-600/20 to-pink-600/20 rounded-2xl p-8 md:p-10 border border-white/10 text-center relative overflow-hidden"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.1)_0%,_transparent_70%)]" />
-      
-      <div className="relative z-10">
-        <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
-          <PlusCircle size={32} className="text-primary" />
+      <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24">
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-primary/20 via-purple-600/20 to-pink-600/20 rounded-2xl p-8 md:p-10 border border-white/10 text-center relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.1)_0%,_transparent_70%)]" />
+            
+            <div className="relative z-10">
+              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                <PlusCircle size={32} className="text-primary" />
+              </div>
+              
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
+                Want to start your own community?
+              </h2>
+              
+              <p className="text-base md:text-lg text-zinc-300 mb-6 max-w-xl mx-auto">
+                Become a creator and build your tribe. Share your passion, knowledge, and connect with like-minded people.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                {user?.is_creator ? (
+                  <Link to="/create-community">
+                    <Button
+                      className="bg-primary text-white rounded-full px-6 py-5 text-sm hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                    >
+                      Create a Community
+                      <ArrowRight className="ml-2" size={16} />
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/login" state={{ from: '/create-community' }}>
+                      <Button
+                        className="bg-primary text-white rounded-full px-6 py-5 text-sm hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                      >
+                        Register as Creator
+                        <ArrowRight className="ml-2" size={16} />
+                      </Button>
+                    </Link>
+                    <Link to="/communities">
+                      <Button
+                        variant="outline"
+                        className="border-white/20 text-white rounded-full px-6 py-5 text-sm hover:bg-white/10 transition-all"
+                      >
+                        Explore Communities
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
+              
+              {!user?.is_creator && (
+                <p className="text-zinc-400 text-xs mt-4">
+                  Already have an account?{' '}
+                  <Link to="/login" className="text-primary hover:text-primary/80">
+                    Sign in
+                  </Link>
+                </p>
+              )}
+            </div>
+          </motion.div>
         </div>
-        
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
-          Want to start your own community?
-        </h2>
-        
-        <p className="text-base md:text-lg text-zinc-300 mb-6 max-w-xl mx-auto">
-          Become a creator and build your tribe. Share your passion, knowledge, and connect with like-minded people.
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          {user?.is_creator ? (
-            <Link to="/create-community">
-              <Button
-                className="bg-primary text-white rounded-full px-6 py-5 text-sm hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-              >
-                Create a Community
-                <ArrowRight className="ml-2" size={16} />
-              </Button>
-            </Link>
-          ) : (
-            <>
-              <Link to="/login" state={{ from: '/create-community' }}>
-                <Button
-                  className="bg-primary text-white rounded-full px-6 py-5 text-sm hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                >
-                  Register as Creator
-                  <ArrowRight className="ml-2" size={16} />
-                </Button>
-              </Link>
-              <Link to="/communities">
-                <Button
-                  variant="outline"
-                  className="border-white/20 text-white rounded-full px-6 py-5 text-sm hover:bg-white/10 transition-all"
-                >
-                  Explore Communities
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
-        
-        {!user?.is_creator && (
-          <p className="text-zinc-400 text-xs mt-4">
-            Already have an account?{' '}
-            <Link to="/login" className="text-primary hover:text-primary/80">
-              Sign in
-            </Link>
-          </p>
-        )}
-      </div>
-    </motion.div>
-  </div>
-</section>
+      </section>
 
-      {/* App Download Section */}
       <section className="py-24 md:py-32 px-6 md:px-12 lg:px-24 bg-gradient-to-b from-transparent to-zinc-950/50">
         <div className="max-w-5xl mx-auto">
           <motion.div
@@ -292,7 +281,6 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center"
           >
-            {/* App Poster Image - Load from local assets folder */}
             <div className="relative w-full max-w-2xl mx-auto mb-8 rounded-3xl overflow-hidden">
               <div className="aspect-[16/9] bg-gradient-to-r from-primary/30 to-purple-600/30 border border-white/10 rounded-3xl flex items-center justify-center">
                 <img 
@@ -301,13 +289,12 @@ export default function Home() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&auto=format&fit=crop"; // Fallback image
+                    e.target.src = "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1200&auto=format&fit=crop";
                   }}
                 />
               </div>
             </div>
             
-            {/* Download Text */}
             <div className="flex items-center justify-center gap-3 mb-8">
               <Smartphone className="text-primary" size={32} />
               <h2 className="text-3xl md:text-4xl font-bold text-white">
@@ -315,7 +302,6 @@ export default function Home() {
               </h2>
             </div>
             
-            {/* App Store Buttons with Links */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a 
                 href={APP_STORE_LINK}
@@ -358,7 +344,6 @@ export default function Home() {
               </a>
             </div>
             
-            {/* Small text */}
             <p className="text-zinc-500 text-sm mt-6">
               Available on iOS and Android devices
             </p>
