@@ -40,3 +40,4 @@ export const CommunityCard = ({ community, index }) => {
     </Link>
   );
 };
+
