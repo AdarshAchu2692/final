@@ -28,6 +28,32 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[db_name]
 
 app = FastAPI(title="Biddge API", version="1.0.0")
+
+# ============ ROOT ENDPOINT - VERIFY APP IS RUNNING ============
+@app.get("/")
+async def root():
+    """
+    Root endpoint to verify the API is running
+    """
+    return {
+        "message": "Biddge API is running!",
+        "status": "ok",
+        "database": db_name,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+# ============ HEALTH CHECK ENDPOINT ============
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint for Render
+    """
+    return {
+        "status": "healthy",
+        "database": "connected" if client else "disconnected",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
 api_router = APIRouter(prefix="/api")
 
 # JWT Configuration
@@ -433,49 +459,7 @@ async def test_endpoint():
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
-# ============ App Configuration ============
-
-# Include router
-app.include_router(api_router)
-
-# Configure CORS
-cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
-print(f"🔓 CORS allowed origins: {cors_origins}")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=cors_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-# ============ Startup/Shutdown Events ============
-
-@app.on_event("startup")
-async def startup_db_client():
-    print("✅ Application startup complete")
-    print(f"📊 Connected to database: {db_name}")
-    
-    # Check if communities collection exists and has data
-    collections = await db.list_collection_names()
-    if "communities" in collections:
-        count = await db.communities.count_documents({})
-        print(f"📊 Communities in database: {count}")
-    else:
-        print("⚠️ Communities collection does not exist yet")
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
-    print("🔒 MongoDB connection closed")
+# ============ Seed Endpoint ============
 
 @api_router.get("/debug/seed")
 async def seed_communities_debug():
@@ -594,6 +578,50 @@ async def seed_communities_debug():
             "error": str(e)
         }
 
+# ============ App Configuration ============
+
+# Include router
+app.include_router(api_router)
+
+# Configure CORS
+cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
+print(f"🔓 CORS allowed origins: {cors_origins}")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# ============ Startup/Shutdown Events ============
+
+@app.on_event("startup")
+async def startup_db_client():
+    print("✅ Application startup complete")
+    print(f"📊 Connected to database: {db_name}")
+    
+    # Check if communities collection exists and has data
+    collections = await db.list_collection_names()
+    if "communities" in collections:
+        count = await db.communities.count_documents({})
+        print(f"📊 Communities in database: {count}")
+    else:
+        print("⚠️ Communities collection does not exist yet")
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    client.close()
+    print("🔒 MongoDB connection closed")
+
 # ============ Main Entry Point ============
 
 if __name__ == "__main__":
@@ -606,4 +634,3 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
-
