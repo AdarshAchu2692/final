@@ -5,5 +5,5 @@ pymongo==4.5.0
 python-dotenv==1.2.1
 passlib[bcrypt]==1.7.4
 pydantic[email]==2.12.5
-python-jose[cryptography]==3.3.0
+pyjwt==2.8.0
 python-multipart==0.0.22
