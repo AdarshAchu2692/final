@@ -1,3 +1,4 @@
+# FORCE DEPLOY - February 12, 2026 - 2:30 PM
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
@@ -605,3 +606,4 @@ if __name__ == "__main__":
         reload=True,
         log_level="info"
     )
+
