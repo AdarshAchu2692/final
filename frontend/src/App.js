@@ -18,18 +18,29 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
+          {/* Public Routes - Anyone can access */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/about" element={<About />} />
           <Route path="/membership" element={<Membership />} />
           <Route path="/events" element={<Events />} />
           <Route path="/careers" element={<Careers />} />
+          
+          {/* Community Routes - Public viewing, protected actions */}
           <Route path="/communities" element={<Communities />} />
           <Route path="/communities/:id" element={<CommunityDetail />} />
           
-
-// Add this with your other routes
-<Route path="/create-community" element={<CreateCommunity />} />
+          {/* Protected Routes - Login required */}
+          <Route
+            path="/create-community"
+            element={
+              <ProtectedRoute>
+                <CreateCommunity />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Creator Routes - Creator account required */}
           <Route
             path="/creator-dashboard"
             element={
