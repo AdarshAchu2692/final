@@ -16,10 +16,9 @@ export default function Communities() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [agentState, setAgentState] = useState('checking'); // 'checking', 'sleeping', 'waking', 'awake', 'empty', 'error'
+  const [agentState, setAgentState] = useState('checking');
   const [user, setUser] = useState(null);
 
-  // Check if user is logged in and get user data
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
@@ -55,7 +54,7 @@ export default function Communities() {
       setAgentState('checking');
       setLoading(true);
       
-      console.log('🔍 Checking Emergent backend status...');
+      console.log('🔍 Checking backend status...');
       
       await axios.get(`${API}/test`, { 
         timeout: 3000,
@@ -79,7 +78,7 @@ export default function Communities() {
       setAgentState('waking');
       setLoading(true);
       
-      console.log('⏰ Waking up Emergent backend...');
+      console.log('⏰ Waking up backend...');
       
       await axios.get(`${API}/test`, { 
         timeout: 15000
@@ -130,9 +129,7 @@ export default function Communities() {
     }
   };
 
-  // Render based on agent state
   const renderContent = () => {
-    // Loading states
     if (loading && agentState !== 'sleeping') {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -143,7 +140,6 @@ export default function Communities() {
       );
     }
 
-    // Agent is sleeping - SHOW WAKE BUTTON
     if (agentState === 'sleeping') {
       return (
         <div className="text-center py-24 max-w-3xl mx-auto">
@@ -154,19 +150,8 @@ export default function Communities() {
             Backend is Sleeping
           </h2>
           <p className="text-xl text-zinc-400 mb-8">
-            Your Emergent agent is hibernating to save resources.
+            Your backend is hibernating to save resources.
           </p>
-          <div className="bg-zinc-900/50 rounded-2xl p-8 mb-8 border border-white/5">
-            <p className="text-zinc-300 mb-4">
-              <span className="text-yellow-400 font-semibold">⚠️ This is normal for Emergent sandbox</span>
-              <br />
-              The agent automatically sleeps after ~15 minutes of inactivity.
-            </p>
-            <p className="text-zinc-400 text-sm mb-6">
-              When you press "Wake Agent", the backend will start up (takes 5-10 seconds)
-              and your communities will appear immediately.
-            </p>
-          </div>
           <button
             onClick={wakeBackend}
             disabled={loading}
@@ -184,14 +169,10 @@ export default function Communities() {
               </>
             )}
           </button>
-          <p className="text-zinc-600 text-sm mt-4">
-            After waking, communities will load automatically
-          </p>
         </div>
       );
     }
 
-    // Agent is waking up
     if (agentState === 'waking') {
       return (
         <div className="text-center py-24">
@@ -205,17 +186,11 @@ export default function Communities() {
             <p className="text-xl text-zinc-400 mb-4">
               This takes 5-10 seconds
             </p>
-            <div className="max-w-md mx-auto">
-              <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-primary w-3/4 rounded-full animate-pulse"></div>
-              </div>
-            </div>
           </div>
         </div>
       );
     }
 
-    // Database is empty
     if (agentState === 'empty' || (agentState === 'awake' && communities.length === 0)) {
       return (
         <div className="text-center py-24">
@@ -246,7 +221,6 @@ export default function Communities() {
       );
     }
 
-    // Error state
     if (agentState === 'error') {
       return (
         <div className="text-center py-24">
@@ -269,14 +243,12 @@ export default function Communities() {
       );
     }
 
-    // Communities loaded successfully - SHOW ALL COMMUNITIES
     if (communities.length > 0) {
       return (
         <>
-          {/* Header with title and create button */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2 text-white" data-testid="communities-title">
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-2 text-white">
                 All Communities
               </h1>
               <p className="text-lg text-zinc-400">
@@ -284,12 +256,11 @@ export default function Communities() {
               </p>
             </div>
             
-            {/* CREATE COMMUNITY BUTTON - Only shows when awake */}
             {agentState === 'awake' && (
               <div className="mt-4 md:mt-0">
                 {user?.is_creator ? (
                   <Link to="/create-community">
-                    <Button className="bg-primary text-white rounded-xl px-6 py-6 hover:bg-primary/90 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                    <Button className="bg-primary text-white rounded-xl px-6 py-6 hover:bg-primary/90 transition-all flex items-center gap-2">
                       <PlusCircle size={20} />
                       <span>Create Community</span>
                     </Button>
@@ -306,7 +277,6 @@ export default function Communities() {
             )}
           </div>
 
-          {/* Search Bar */}
           <div className="relative max-w-xl mb-8">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={20} />
             <Input
@@ -315,17 +285,14 @@ export default function Communities() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 bg-zinc-900/50 border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 rounded-xl h-14 text-white placeholder:text-zinc-500"
-              data-testid="search-input"
             />
           </div>
 
-          {/* Results count */}
           <div className="mb-4 text-zinc-400">
             Showing {filteredCommunities.length} of {communities.length} communities
           </div>
 
-          {/* Communities Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="communities-list">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCommunities.map((community, index) => (
               <CommunityCard 
                 key={community.id || community._id || `community-${index}`} 
@@ -334,28 +301,6 @@ export default function Communities() {
               />
             ))}
           </div>
-
-          {/* Creator Info Banner - Only show for non-creators */}
-          {agentState === 'awake' && user && !user.is_creator && communities.length > 0 && (
-            <div className="mt-12 bg-gradient-to-r from-primary/10 to-purple-600/10 rounded-2xl p-6 border border-primary/20">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <PlusCircle size={24} className="text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-semibold text-lg">Want to create your own community?</h3>
-                    <p className="text-zinc-400">Register as a creator to start building your tribe</p>
-                  </div>
-                </div>
-                <Link to="/login" state={{ from: '/create-community' }}>
-                  <Button className="bg-primary text-white rounded-xl px-6 py-3 hover:bg-primary/90 transition-all whitespace-nowrap">
-                    Become a Creator
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
         </>
       );
     }
